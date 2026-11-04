@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdlib.h>
+#include <string.h>
 
 // Allocates memory safely, exiting the program on failure.
 //
@@ -23,8 +24,14 @@ safe_strdup(char *str);
 // Frees a pointer safely and sets it to NULL.
 //
 // ptr_p - address of the pointer to free
-void
-_safe_free(void **ptr_p);
+static inline void
+safe_free_impl(void *ptr_p) {
+  void *p;
+  memcpy(&p, ptr_p, sizeof p);
+  free(p);
+  p = NULL;
+  memcpy(ptr_p, &p, sizeof p);
+}
 
-// Macro wrapper for _safe_free, for easier use
-#define safe_free(ptr) _safe_free((void **)&(ptr))
+// Macro wrapper for safe_free_impl, for easier use
+#define safe_free(ptr) safe_free_impl(&(ptr))

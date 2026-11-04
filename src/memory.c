@@ -1,3 +1,5 @@
+#include "memory.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -24,13 +26,4 @@ safe_strdup(char *str) {
   }
 
   return p;
-}
-
-void
-_safe_free(void **ptr_p) {
-  if (ptr_p == NULL)
-    return;
-
-  free(*ptr_p);
-  *ptr_p = NULL;
 }
