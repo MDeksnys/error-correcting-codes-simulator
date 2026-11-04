@@ -27,6 +27,7 @@ char **
 decode_all(Matrix *matrix_p, char **vectors, size_t vec_count) {
   char **result = safe_malloc(vec_count * sizeof(char *));
 
+  #pragma omp parallel for
   for (size_t i = 0; i < vec_count; i++)
     result[i] = decode(matrix_p, vectors[i]);
 

@@ -37,9 +37,9 @@ Paleidžiamasis failas: *A11* (Linux) _arba_ *A11.exe* (Windows).
 #figure(
   ```bash
   # Linux
-  gcc -O3 -DNDEBUG src/*.c -o A11
+  gcc -O3 -DNDEBUG -fopenmp src/*.c -o A11
   # Windows
-  cl /O2 /DNDEBUG src\*.c /FeA11.exe /link Shell32.lib
+  cl /O2 /DNDEBUG /openmp:llvm src\*.c /FeA11.exe /link Shell32.lib
   ```,
   caption: [Programos kompiliavimas pavyzdys]
 )
