@@ -1,4 +1,6 @@
-# Error-correcting codes
+# Error-correcting codes (Task A11)
+
+**University Coursework** | *Error-Correcting Codes / Coding Theory*
 
 Command-line simulator of binary linear codes over a noisy channel, written in C.
 Encodes data with a generator matrix, sends it through a binary symmetric channel,
