@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "bit_string.h"
 #include "decode.h"
 #include "encode.h"
 
@@ -15,6 +14,7 @@
   #include <unistd.h>
 #endif
 
+#include "bit_string.h"
 #include "channel.h"
 #include "cli.h"
 #include "memory.h"
@@ -45,31 +45,29 @@ scenario3(Cli *cli_p) {
   calculate_metadata();
   open_file(metadata.filename);
 
-  char *bits = extract_bits_from_bmp(metadata.filename);
+  char *pixel_bytes = extract_pixel_bytes_from_bmp(metadata.filename);
+  size_t len = metadata.pixel_data_length;
+  const size_t total_bits = len * 8;
+  const size_t vec_count = (total_bits / k) + (total_bits % k == 0 ? 0 : 1);
+  uint64_t *vecs = safe_malloc(vec_count * sizeof(uint64_t));
 
-  const size_t length = metadata.pixel_data_length * 8;
-  const size_t vec_count = (length / k) + (length % k == 0 ? 0 : 1);
-
-  char **bit_vecs = safe_malloc(vec_count * sizeof(char *));
-  uint8_t count_appended = vectors_from_bit_string(&bit_vecs, bits, length, vec_count, k);
+  vectors_from_string(vecs, pixel_bytes, len, vec_count, k);
 
   puts("Sending over channel...");
-  char **received_unencoded_vecs = channel_send_vectors(bit_vecs, vec_count, p_e, k);
+  uint64_t *received_unencoded_vecs = channel_send_vectors(vecs, vec_count, p_e, k);
   puts("Converting...\n");
-  char *received_unencoded_bits =
-    bit_string_from_vectors(received_unencoded_vecs, count_appended, vec_count, k);
-  char *received_unencoded_msg = bytes_from_bit_string(received_unencoded_bits);
+  char *received_unencoded_msg =
+    bytes_from_vectors(received_unencoded_vecs, vec_count, k, len);
 
   puts("Encoding...");
-  char **encoded_vecs = encode_all(G, bit_vecs, vec_count);
+  uint64_t *encoded_vecs = encode_all(G, vecs, vec_count);
   puts("Sending over channel...");
-  char **received_encoded_vecs = channel_send_vectors(encoded_vecs, vec_count, p_e, n);
+  uint64_t *received_encoded_vecs = channel_send_vectors(encoded_vecs, vec_count, p_e, n);
   puts("Decoding...");
-  char **received_decoded_vecs = decode_all(G, received_encoded_vecs, vec_count);
+  uint64_t *received_decoded_vecs = decode_all(G, received_encoded_vecs, vec_count);
   puts("Converting...");
-  char *received_decoded_bits =
-    bit_string_from_vectors(received_decoded_vecs, count_appended, vec_count, k);
-  char *received_decoded_msg = bytes_from_bit_string(received_decoded_bits);
+  char *received_decoded_msg =
+    bytes_from_vectors(received_decoded_vecs, vec_count, k, len);
 
   char filename_unencoded[FILENAME_MAX];
   snprintf(filename_unencoded, FILENAME_MAX, "unencoded_%s", metadata.filename);
@@ -83,28 +81,15 @@ scenario3(Cli *cli_p) {
   open_file(filename_unencoded);
   open_file(filename_decoded);
 
-  for (size_t i = 0; i < vec_count; i++) {
-    safe_free(received_unencoded_vecs[i]);
-    safe_free(received_encoded_vecs[i]);
-    safe_free(received_decoded_vecs[i]);
-    safe_free(encoded_vecs[i]);
-    safe_free(bit_vecs[i]);
-  }
-
   safe_free(received_unencoded_vecs);
-  safe_free(received_unencoded_bits);
   safe_free(received_unencoded_msg);
-
   safe_free(received_decoded_vecs);
-  safe_free(received_decoded_bits);
   safe_free(received_decoded_msg);
-
   safe_free(received_encoded_vecs);
   safe_free(encoded_vecs);
-
   safe_free(metadata.header.data);
-  safe_free(bit_vecs);
-  safe_free(bits);
+  safe_free(vecs);
+  safe_free(pixel_bytes);
 };
 
 static inline char *
@@ -146,7 +131,7 @@ calculate_metadata() {
   FILE *file = fopen(metadata.filename, "rb");
   assert(file != NULL);
 
-  char *partial_header = safe_malloc(14);
+  uint8_t *partial_header = safe_malloc(14);
   fread(partial_header, 1, 14, file);
   uint32_t offset_bytes = read_32_at_offset(partial_header, 10);
   safe_free(partial_header);
@@ -168,7 +153,7 @@ calculate_metadata() {
 }
 
 static inline char *
-extract_bits_from_bmp(char *filename) {
+extract_pixel_bytes_from_bmp(char *filename) {
   FILE *file = fopen(filename, "rb");
   assert(file != NULL);
 
@@ -180,10 +165,7 @@ extract_bits_from_bmp(char *filename) {
   fread(buffer, 1, metadata.pixel_data_length, file);
   fclose(file);
 
-  char *result = bit_string_from_bytes(buffer, metadata.pixel_data_length);
-  safe_free(buffer);
-
-  return result;
+  return buffer;
 }
 
 static inline void
@@ -209,7 +191,7 @@ write_file(char *filename, char *data) {
 }
 
 static inline uint32_t
-read_32_at_offset(char *header, uint8_t offset) {
+read_32_at_offset(uint8_t *header, uint8_t offset) {
   return ((uint32_t)header[offset]) | ((uint32_t)header[offset + 1] << 8) |
          ((uint32_t)header[offset + 2] << 16) | ((uint32_t)header[offset + 3] << 24);
 }

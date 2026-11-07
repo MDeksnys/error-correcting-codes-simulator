@@ -1,101 +1,57 @@
 #include "bit_string.h"
 
-#include <assert.h>
-#include <stdio.h>
 #include <string.h>
 
 #include "memory.h"
 
-uint8_t
-vectors_from_bit_string(char ***vectors_p,
-                        char *input,
-                        size_t input_length,
-                        size_t vector_count,
-                        uint8_t vector_length) {
-  char **vectors = *vectors_p;
-  uint8_t append_count = 0;
-
-  for (size_t i = 0; i < vector_count; i++) {}
+void
+vectors_from_string(uint64_t *bit_vecs,
+                    const char *input,
+                    size_t input_length,
+                    size_t vector_count,
+                    uint8_t vector_length) {
+  size_t total_bits = input_length * 8;
 
   for (size_t i = 0; i < vector_count; i++) {
-    char *vector = safe_malloc(vector_length + 1);
+    uint64_t vector = 0;
 
     for (uint8_t j = 0; j < vector_length; j++) {
-      if (i * vector_length + j >= input_length) {
-        vector[j] = '0';
-        append_count++;
+      size_t bit_index = i * vector_length + j;
 
+      if (bit_index >= total_bits)
         continue;
-      }
 
-      vector[j] = input[i * vector_length + j];
+      size_t byte_idx = bit_index / 8;
+      size_t bit_off = bit_index % 8;
+      uint8_t bit = (input[byte_idx] >> bit_off) & 1;
+
+      vector |= ((uint64_t)bit << j);
     }
 
-    vector[vector_length] = '\0';
-    vectors[i] = vector;
+    bit_vecs[i] = vector;
   }
-
-  return append_count;
 }
 
 char *
-bit_string_from_vectors(char **vectors,
-                        uint8_t count_appended,
-                        size_t vector_count,
-                        uint8_t vector_length) {
-  size_t length = vector_count * vector_length - count_appended;
-  char *result = safe_malloc(length + 1);
+bytes_from_vectors(const uint64_t *vecs,
+                   size_t vector_count,
+                   uint8_t vector_length,
+                   size_t byte_count) {
+  uint8_t *bytes = safe_malloc(byte_count + 1);
+  memset(bytes, 0, byte_count + 1);
+
+  size_t bit_count = byte_count * 8;
 
   for (size_t i = 0; i < vector_count; i++) {
     for (uint8_t j = 0; j < vector_length; j++) {
       size_t index = i * vector_length + j;
 
-      if (index >= length)
-        goto end_loop;
+      if (index >= bit_count)
+        return (char *)bytes;  // rest is padding
 
-      result[index] = vectors[i][j];
-    }
-  }
-end_loop:
-
-  result[length] = '\0';
-  return result;
-}
-
-char *
-bytes_from_bit_string(char *bit_str) {
-  assert(strlen(bit_str) % 8 == 0);
-
-  size_t length = strlen(bit_str) / 8;
-  char *buffer = safe_malloc(length + 1);
-
-  for (size_t i = 0; i < length; i++) {
-    buffer[i] = 0;
-
-    for (uint8_t j = 0; j < 8; j++) {
-      uint8_t bit = 1 << j;
-      char c = bit_str[i * 8 + j];
-      buffer[i] |= (c == '0' ? 0 : bit);
+      bytes[index / 8] |= (uint8_t)(((vecs[i] >> j) & 1) << (index % 8));
     }
   }
 
-  buffer[length] = '\0';
-  return buffer;
-}
-
-char *
-bit_string_from_bytes(char *str, size_t length) {
-  char *buffer = safe_malloc(length * 8 + 1);
-
-  for (size_t i = 0; i < length; i++) {
-    char byte = str[i];
-
-    for (uint8_t j = 0; j < 8; j++) {
-      uint8_t bit = (byte >> j) & 1;
-      buffer[i * 8 + j] = '0' + bit;
-    }
-  }
-
-  buffer[length * 8] = '\0';
-  return buffer;
+  return (char *)bytes;
 }

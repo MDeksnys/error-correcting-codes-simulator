@@ -108,59 +108,41 @@ matrix_parity_check(Matrix *matrix_p) {
   return h;
 }
 
-char *
-matrix_vector_mul(Matrix *matrix_p, char *vec) {
-  assert(vec != NULL);
+uint64_t
+matrix_vector_mul(Matrix *matrix_p, uint64_t vec) {
   assert(matrix_p != NULL && matrix_p->data != NULL && matrix_p->order != NULL);
-  assert(strlen(vec) == matrix_p->col_count);
 
   uint8_t col_count = matrix_p->col_count;
   uint8_t row_count = matrix_p->row_count;
   uint8_t *data = matrix_p->data;
 
-  char *result = safe_malloc(row_count + 1);
-
-  for (uint8_t i = 0; i < row_count; i++)
-    result[i] = 0;
+  uint64_t result = 0;
 
   // using XOR because mod2
   for (uint8_t col = 0; col < col_count; col++)
-    if (vec[col] == '1')
+    if ((vec >> col) & 1)
       for (uint8_t row = 0; row < row_count; row++)
-        result[row] ^= data[row * col_count + col];
+        result ^= (uint64_t)data[row * col_count + col] << row;
 
-  for (uint8_t i = 0; i < row_count; i++)
-    result[i] += '0';
-
-  result[row_count] = '\0';
   return result;
 }
 
-char *
-vector_matrix_mul(char *vec, Matrix *matrix_p) {
-  assert(vec != NULL);
+uint64_t
+vector_matrix_mul(uint64_t vec, Matrix *matrix_p) {
   assert(matrix_p != NULL && matrix_p->data != NULL && matrix_p->order != NULL);
-  assert(strlen(vec) == matrix_p->row_count);
 
   uint8_t col_count = matrix_p->col_count;
   uint8_t row_count = matrix_p->row_count;
   uint8_t *data = matrix_p->data;
 
-  char *result = safe_malloc(col_count + 1);
-
-  for (uint8_t i = 0; i < col_count; i++)
-    result[i] = 0;
+  uint64_t result = 0;
 
   // using XOR because mod2
   for (uint8_t row = 0; row < row_count; row++)
-    if (vec[row] == '1')
+    if ((vec >> row) & 1)
       for (uint8_t col = 0; col < col_count; col++)
-        result[col] ^= data[row * col_count + col];
+        result ^= (uint64_t)data[row * col_count + col] << col;
 
-  for (uint8_t i = 0; i < col_count; i++)
-    result[i] += '0';
-
-  result[col_count] = '\0';
   return result;
 }
 

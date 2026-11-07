@@ -7,101 +7,75 @@
 #include <string.h>
 
 #include "matrix.h"
-#include "memory.h"
 
-bool
-vector_is_valid(char *vec, uint8_t expected_length) {
-  assert(vec != NULL);
+ParseResult
+vector_parse(const char *str, uint8_t length) {
+  uint64_t vec = 0;
 
-  for (uint8_t i = 0; i < expected_length; i++) {
-    char c = vec[i];
-    if (c != '0' && c != '1')
-      return false;
+  for (uint8_t i = 0; i < length; i++) {
+    if (str[i] != '0' && str[i] != '1')
+      return (ParseResult){.ok = false};
+
+    vec |= (uint64_t)(str[i] - '0') << i;
   }
 
-  if (vec[expected_length] != '\0')
-    return false;
+  if (str[length] != '\0')
+    return (ParseResult){.ok = false};
 
-  return true;
+  return (ParseResult){.ok = true, .vec = vec};
 }
 
-char *
-vector_add(char *vec1, char *vec2, uint8_t length) {
-  assert(vector_is_valid(vec1, length));
-  assert(vector_is_valid(vec2, length));
-
-  char *sum = safe_malloc(length + 1);
-
+void
+vector_format(uint64_t vec, uint8_t length, char *out) {
   for (uint8_t i = 0; i < length; i++)
-    sum[i] = '0' + (vec1[i] ^ vec2[i]);
-  sum[length] = '\0';
+    out[i] = '0' + ((vec >> i) & 1);
 
-  return sum;
+  out[length] = '\0';
 }
 
-char *
-vector_zero(uint8_t length) {
-  char *vec = safe_malloc(length + 1);
-
-  for (uint8_t i = 0; i < length; i++)
-    vec[i] = '0';
-  vec[length] = '\0';
-
-  return vec;
-}
-
-char *
-vector_syndrome(Matrix *parity_check_matrix_p, char *vec) {
-  assert(vec != NULL);
+uint64_t
+vector_syndrome(Matrix *parity_check_matrix_p, uint64_t vec) {
   assert(matrix_is_valid(parity_check_matrix_p));
-  assert(strlen(vec) == parity_check_matrix_p->col_count);
 
   return matrix_vector_mul(parity_check_matrix_p, vec);
 }
 
 uint8_t
-vector_weight(char *vec) {
-  assert(vec != NULL);
-
+vector_weight(uint64_t vec) {
   uint8_t result = 0;
 
-  for (char *ptr = vec; *ptr != '\0'; ptr++)
-    result += *ptr != '0' ? 1 : 0;
+  while (vec != 0) {
+    result++;
+    vec &= vec - 1;  // clears lowest bit
+  }
 
   return result;
 }
 
-void
-vector_from_positions(char **vec_p, uint8_t *positions, uint8_t weight, uint8_t length) {
-  assert(vec_p != NULL);
-  assert(*vec_p != NULL);
-
-  char *vec = *vec_p;
-
-  for (uint8_t i = 0; i < length; i++)
-    vec[i] = '0';
+uint64_t
+vector_from_positions(const uint8_t *positions, uint8_t weight) {
+  uint64_t vec = 0;
 
   for (uint8_t i = 0; i < weight; i++)
-    vec[positions[i]] = '1';
+    vec |= (uint64_t)1 << positions[i];
 
-  vec[length] = '\0';
+  return vec;
 }
 
 bool
-next_vector_with_weight(char **vec_p,
+next_vector_with_weight(uint64_t *vec_p,
                         uint8_t **positions_p,
                         uint8_t weight,
                         uint8_t length) {
   assert(vec_p != NULL);
-  assert(*vec_p != NULL);
   assert(positions_p != NULL);
 
-  char *vec = *vec_p;
+  uint64_t vec = *vec_p;
   uint8_t *positions = *positions_p;
 
   uint8_t count = 0;
   for (uint8_t i = 0; i < weight; i++) {
-    if (vec[length - 1 - i] != '1')
+    if (!((vec >> (length - 1 - i)) & 1))
       break;
 
     count++;
@@ -116,7 +90,7 @@ next_vector_with_weight(char **vec_p,
   for (uint8_t i = 1; i <= count; i++)
     positions[index + i] = positions[index] + i;
 
-  vector_from_positions(vec_p, positions, weight, length);
+  *vec_p = vector_from_positions(positions, weight);
 
   return true;
 }

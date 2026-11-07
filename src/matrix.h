@@ -41,22 +41,20 @@ matrix_parity_check(Matrix *matrix_p);
 // Multiplies a matrix by a binary vector (mod 2).
 //
 // matrix_p - pointer to a valid Matrix
-// vec      - null-terminated binary string
+// vec      - the vector
 //
-// Returns a newly allocated null-terminated string representing the result.
-// Caller is responsible for freeing the returned string.
-char *
-matrix_vector_mul(Matrix *matrix_p, char *vec);
+// Returns the product, a vector with row_count coordinates.
+uint64_t
+matrix_vector_mul(Matrix *matrix_p, uint64_t vec);
 
 // Multiplies a binary vector by a matrix (mod 2).
 //
-// vec      - null-terminated binary string
+// vec      - the vector
 // matrix_p - pointer to a valid Matrix
 //
-// Returns a newly allocated null-terminated string representing the result.
-// Caller is responsible for freeing the returned string.
-char *
-vector_matrix_mul(char *vec, Matrix *matrix_p);
+// Returns the product, a vector with col_count coordinates.
+uint64_t
+vector_matrix_mul(uint64_t vec, Matrix *matrix_p);
 
 // Converts a matrix into standard form.
 //

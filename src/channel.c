@@ -2,30 +2,28 @@
 #include <stdio.h>
 
 #include "memory.h"
-#include "vector.h"
 
-char *
+uint64_t
 channel_error_vector(double error_probability, uint8_t length) {
-  char *error_vector = safe_malloc(length + 1);
+  uint64_t error = 0;
 
   for (uint8_t i = 0; i < length; i++)
-    error_vector[i] = (double)rand() / (double)RAND_MAX < error_probability ? '1' : '0';
-  error_vector[length] = '\0';
+    if (((double)rand() / (double)RAND_MAX) < error_probability)
+      error |= (uint64_t)1 << i;
 
-  return error_vector;
+  return error;
 }
 
-char **
-channel_send_vectors(char **vectors,
+uint64_t *
+channel_send_vectors(uint64_t *vectors,
                      size_t vector_count,
                      double error_probability,
                      uint8_t vector_length) {
-  char **result = safe_malloc(vector_count * sizeof(char *));
+  uint64_t *result = safe_malloc(vector_count * sizeof(uint64_t));
 
   for (size_t i = 0; i < vector_count; i++) {
-    char *error_vector = channel_error_vector(error_probability, vector_length);
-    result[i] = vector_add(vectors[i], error_vector, vector_length);
-    safe_free(error_vector);
+    uint64_t error_vector = channel_error_vector(error_probability, vector_length);
+    result[i] = vectors[i] ^ error_vector;
   }
 
   return result;

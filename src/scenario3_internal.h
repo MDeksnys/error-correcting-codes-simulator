@@ -22,14 +22,14 @@ request_bmp_filename(void);
 static inline void
 calculate_metadata(void);
 
-// Extracts the bits from the pixel data of a BMP file.
+// Reads the pixel data of a BMP file.
 //
 // filename - path to the BMP file
 //
-// Returns a newly allocated null-terminated string of bits (each bit is it's own char).
+// Returns a newly allocated buffer of metadata.pixel_data_length bytes.
 // Caller is responsible for freeing the returned memory.
 static inline char *
-extract_bits_from_bmp(char *filename);
+extract_pixel_bytes_from_bmp(char *filename);
 
 // Opens a file using the system's default application.
 //
@@ -52,4 +52,4 @@ write_file(char *filename, char *data);
 //
 // Returns a 32-bit value.
 static inline uint32_t
-read_32_at_offset(char *header, uint8_t offset);
+read_32_at_offset(uint8_t *header, uint8_t offset);

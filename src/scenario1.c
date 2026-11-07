@@ -3,12 +3,12 @@
 #include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "channel.h"
 #include "cli.h"
 #include "decode.h"
 #include "encode.h"
-#include "memory.h"
 #include "scenario1_internal.h"
 #include "vector.h"
 
@@ -23,64 +23,84 @@ scenario1(Cli *cli_p) {
   uint8_t n = cli_p->code_length;
   Matrix *G = &cli_p->generator_matrix;
 
-  char *input = request_input_vector(k);
-  char *encoded = encode(G, input);
-  char *error = channel_error_vector(p_e, n);
-  char *received = vector_add(encoded, error, n);
+  uint64_t input = request_input_vector(k);
+  uint64_t encoded = encode(G, input);
+  uint64_t error = channel_error_vector(p_e, n);
+  uint64_t received = encoded ^ error;
 
-  print_all_vectors(input, encoded, error, received);
+  print_all_vectors(k, n, input, encoded, error, received);
 
   printf("\nDo you want to use a custom error vector? (y/N) ");
 
-  char input_char = getchar();
+  int input_char = getchar();
+  if (input_char != '\n' && input_char != EOF)
+    discard_line();
+
   if (input_char == 'y' || input_char == 'Y') {
-    safe_free(error);
-    safe_free(received);
-
     error = request_input_vector(n);
-    received = vector_add(encoded, error, n);
+    received = encoded ^ error;
 
-    print_all_vectors(input, encoded, error, received);
+    print_all_vectors(k, n, input, encoded, error, received);
   }
 
-  char *decoded = decode(G, received);
+  uint64_t decoded = decode(G, received);
 
-  printf("\nInitial vector: %s\nDecoded vector: %s\n", input, decoded);
+  char input_str[65];
+  char decoded_str[65];
+  vector_format(input, k, input_str);
+  vector_format(decoded, k, decoded_str);
 
-  safe_free(input);
-  safe_free(encoded);
-  safe_free(error);
-  safe_free(received);
-  safe_free(decoded);
-}
-
-static inline char *
-request_input_vector(uint8_t length) {
-  char *buffer = safe_malloc(length + 1);
-  char format[10];
-  sprintf(format, "%%%ds", length);
-
-  do {
-    printf("Enter a binary vector of length %d: ", length);
-    scanf(format, buffer);
-    while ((getchar()) != '\n')
-      ;
-  } while (!vector_is_valid(buffer, length));
-
-  return buffer;
+  printf("\nInitial vector: %s\nDecoded vector: %s\n", input_str, decoded_str);
 }
 
 static inline void
-print_all_vectors(char *input, char *encoded, char *error, char *received) {
+discard_line(void) {
+  int c;
+  while ((c = getchar()) != '\n' && c != EOF)
+    ;
+}
+
+static inline uint64_t
+request_input_vector(uint8_t length) {
+  char buffer[65];
+  ParseResult res;
+
+  do {
+    printf("Enter a binary vector of length %d: ", length);
+    if (scanf("%64s", buffer) != 1)
+      exit(EXIT_FAILURE);
+
+    buffer[length] = '\0';
+    discard_line();
+
+    res = vector_parse(buffer, length);
+  } while (!res.ok);
+
+  return res.vec;
+}
+
+static inline void
+print_all_vectors(uint8_t k,
+                  uint8_t n,
+                  uint64_t input,
+                  uint64_t encoded,
+                  uint64_t error,
+                  uint64_t received) {
+  char m[65], c[65], e[65], y[65];
+  vector_format(input, k, m);
+  vector_format(encoded, n, c);
+  vector_format(error, n, e);
+  vector_format(received, n, y);
+
   printf(
     "\n"
     "m = %s\n"
     "c = %s = mG\n"
     "e = %s (# of errors: %hhu)\n"
     "y = %s = c + e\n",
-    input,
-    encoded,
-    error,
+    m,
+    c,
+    e,
     vector_weight(error),
-    received);
+    y);
 }
