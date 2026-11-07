@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include "decode_internal.h"
+#include "matrix.h"
 #include "memory.h"
 #include "vector.h"
 

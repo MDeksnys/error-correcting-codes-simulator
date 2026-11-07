@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -7,6 +8,7 @@
 #include "cli.h"
 #include "decode.h"
 #include "encode.h"
+#include "matrix.h"
 #include "memory.h"
 
 #define MAXIMUM_INPUT_LENGTH 1024

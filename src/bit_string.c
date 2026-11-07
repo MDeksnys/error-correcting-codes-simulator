@@ -1,5 +1,6 @@
 #include "bit_string.h"
 
+#include <stdint.h>
 #include <string.h>
 
 #include "memory.h"

@@ -1,9 +1,11 @@
 #include <assert.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
 #include "decode.h"
 #include "encode.h"
+#include "matrix.h"
 
 #ifdef _WIN32
 // clang-format off

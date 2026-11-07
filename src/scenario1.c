@@ -9,6 +9,7 @@
 #include "cli.h"
 #include "decode.h"
 #include "encode.h"
+#include "matrix.h"
 #include "scenario1_internal.h"
 #include "vector.h"
 

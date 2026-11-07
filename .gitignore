@@ -1,6 +1,7 @@
 # Build output
 A11
 A11.exe
+compile_commands.json
 
 unencoded_*.bmp
 decoded_*.bmp
