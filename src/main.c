@@ -7,40 +7,39 @@
 #include "scenario2.h"
 #include "scenario3.h"
 
-int
-main(int argc, char **argv) {
-  Cli cli = cli_init(argc, argv);
+int main(int argc, char **argv) {
+    Cli cli = cli_init(argc, argv);
 
-  if (!cli_is_valid(&cli)) {
-    cli_print_error(&cli);
-    cli_free(&cli);
-    return 1;
-  }
+    if (!cli_is_valid(&cli)) {
+        cli_print_error(&cli);
+        cli_free(&cli);
+        return 1;
+    }
 
-  size_t seed = cli.seed_given ? cli.seed : time(NULL);
-  srand(seed);
-  printf("Seed: %zu\n\n", seed);
+    size_t seed = cli.seed_given ? cli.seed : time(NULL);
+    srand(seed);
+    printf("Seed: %zu\n\n", seed);
 
-  switch (cli.scenario) {
+    switch (cli.scenario) {
     case 0:
-      scenario1(&cli);
-      puts("\nPress Enter to continue...");
-      getchar();
-      scenario2(&cli);
-      puts("\nPress Enter to continue...");
-      getchar();
-      scenario3(&cli);
-      break;
+        scenario1(&cli);
+        puts("\nPress Enter to continue...");
+        getchar();
+        scenario2(&cli);
+        puts("\nPress Enter to continue...");
+        getchar();
+        scenario3(&cli);
+        break;
     case 1:
-      scenario1(&cli);
-      break;
+        scenario1(&cli);
+        break;
     case 2:
-      scenario2(&cli);
-      break;
+        scenario2(&cli);
+        break;
     case 3:
-      scenario3(&cli);
-      break;
-  }
+        scenario3(&cli);
+        break;
+    }
 
-  cli_free(&cli);
+    cli_free(&cli);
 }

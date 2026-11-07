@@ -9,8 +9,7 @@
 // length            - length of the error vector to generate
 //
 // Returns the error vector.
-uint64_t
-channel_error_vector(double error_probability, uint8_t length);
+uint64_t channel_error_vector(double error_probability, uint8_t length);
 
 // Applies random errors to an array of binary vectors.
 //
@@ -21,8 +20,9 @@ channel_error_vector(double error_probability, uint8_t length);
 //
 // Returns a newly allocated array of vectors with errors applied.
 // Caller is responsible for freeing the returned array.
-uint64_t *
-channel_send_vectors(uint64_t *vectors,
-                     size_t vector_count,
-                     double error_probability,
-                     uint8_t vector_length);
+uint64_t *channel_send_vectors(
+    uint64_t *vectors,
+    size_t vector_count,
+    double error_probability,
+    uint8_t vector_length
+);

@@ -4,5 +4,4 @@
 //
 // Returns a newly allocated null-terminated string containing the full input.
 // Caller is responsible for freeing the returned memory.
-static inline char*
-request_input(void);
+static inline char *request_input(void);

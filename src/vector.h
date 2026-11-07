@@ -1,12 +1,13 @@
 #pragma once
 
 #include <stdbool.h>
+#include <stdint.h>
 
 #include "matrix.h"
 
 typedef struct {
-  bool ok;
-  uint64_t vec;
+    bool ok;
+    uint64_t vec;
 } ParseResult;
 
 // Parses a string of '0' and '1' characters into a vector.
@@ -17,8 +18,7 @@ typedef struct {
 //
 // Returns ok = true and the vector if the string has exactly length valid
 // characters. Otherwise ok = false and vec = 0.
-ParseResult
-vector_parse(const char *str, uint8_t length);
+ParseResult vector_parse(const char *str, uint8_t length);
 
 // Writes a vector as a null-terminated string of '0' and '1' characters,
 // coordinate 0 first.
@@ -26,8 +26,7 @@ vector_parse(const char *str, uint8_t length);
 // vec    - the vector
 // length - number of coordinates to write (at most 64)
 // out    - buffer of at least length + 1 characters
-void
-vector_format(uint64_t vec, uint8_t length, char *out);
+void vector_format(uint64_t vec, uint8_t length, char *out);
 
 // Computes the syndrome of a binary vector.
 //
@@ -35,16 +34,14 @@ vector_format(uint64_t vec, uint8_t length, char *out);
 // vec                   - binary vector whose syndrome is to be computed
 //
 // Returns the syndrome.
-uint64_t
-vector_syndrome(Matrix *parity_check_matrix_p, uint64_t vec);
+uint64_t vector_syndrome(Matrix *parity_check_matrix_p, uint64_t vec);
 
 // Computes the weight of a binary vector.
 //
 // vec - the vector
 //
 // Returns the number of bits set to 1.
-uint8_t
-vector_weight(uint64_t vec);
+uint8_t vector_weight(uint64_t vec);
 
 // Creates a vector with 1s at the given coordinates.
 //
@@ -52,8 +49,7 @@ vector_weight(uint64_t vec);
 // weight    - number of coordinates in the array
 //
 // Returns the vector.
-uint64_t
-vector_from_positions(const uint8_t *positions, uint8_t weight);
+uint64_t vector_from_positions(const uint8_t *positions, uint8_t weight);
 
 // Advances a binary vector to the next vector of the same weight.
 //
@@ -78,8 +74,9 @@ vector_from_positions(const uint8_t *positions, uint8_t weight);
 //     10011    [0, 3, 4]
 //     01110    [1, 2, 3]
 //     ...
-bool
-next_vector_with_weight(uint64_t *vec_p,
-                        uint8_t **positions_p,
-                        uint8_t weight,
-                        uint8_t length);
+bool next_vector_with_weight(
+    uint64_t *vec_p,
+    uint8_t **positions_p,
+    uint8_t weight,
+    uint8_t length
+);

@@ -14,12 +14,13 @@
 // Bit i of the stream becomes coordinate (i % vector_length) of vector
 // (i / vector_length). The last vector is padded with 0s if the input does
 // not fill it.
-void
-vectors_from_string(uint64_t *vecs,
-                    const char *input,
-                    size_t input_length,
-                    size_t vector_count,
-                    uint8_t vector_length);
+void vectors_from_string(
+    uint64_t *vecs,
+    const char *input,
+    size_t input_length,
+    size_t vector_count,
+    uint8_t vector_length
+);
 
 // Joins an array of vectors back into a string.
 //
@@ -31,8 +32,9 @@ vectors_from_string(uint64_t *vecs,
 //
 // Returns a newly allocated buffer of byte_count + 1 bytes, null-terminated.
 // Caller is responsible for freeing the returned memory.
-char *
-bytes_from_vectors(const uint64_t *vecs,
-                   size_t vector_count,
-                   uint8_t vector_length,
-                   size_t byte_count);
+char *bytes_from_vectors(
+    const uint64_t *vecs,
+    size_t vector_count,
+    uint8_t vector_length,
+    size_t byte_count
+);

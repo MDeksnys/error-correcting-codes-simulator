@@ -1,6 +1,8 @@
 #pragma once
 
 #include "matrix.h"
+#include <stdint.h>
+#include <stddef.h>
 
 // Decodes a single binary vector.
 //
@@ -8,8 +10,7 @@
 // vec      - the binary vector to decode
 //
 // Returns the decoded vector.
-uint64_t
-decode(Matrix *matrix_p, uint64_t vec);
+uint64_t decode(Matrix *matrix_p, uint64_t vec);
 
 // Decodes an array of binary vectors.
 //
@@ -19,5 +20,4 @@ decode(Matrix *matrix_p, uint64_t vec);
 //
 // Returns a newly allocated array of decoded vectors.
 // Caller is responsible for freeing the returned array.
-uint64_t *
-decode_all(Matrix *matrix_p, uint64_t *vectors, size_t vec_count);
+uint64_t *decode_all(Matrix *matrix_p, uint64_t *vectors, size_t vec_count);

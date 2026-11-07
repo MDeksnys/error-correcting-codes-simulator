@@ -4,26 +4,24 @@
 #include <stdlib.h>
 #include <string.h>
 
-void *
-safe_malloc(size_t size) {
-  void *p = malloc(size);
+void *safe_malloc(size_t size) {
+    void *p = malloc(size);
 
-  if (p == NULL) {
-    fprintf(stderr, "Out of memory!\n");
-    exit(EXIT_FAILURE);
-  }
+    if (p == NULL) {
+        fprintf(stderr, "Out of memory!\n");
+        exit(EXIT_FAILURE);
+    }
 
-  return p;
+    return p;
 }
 
-char *
-safe_strdup(char *str) {
-  char *p = strdup(str);
+char *safe_strdup(char *str) {
+    char *p = strdup(str);
 
-  if (p == NULL) {
-    fprintf(stderr, "Out of memory!\n");
-    exit(EXIT_FAILURE);
-  }
+    if (p == NULL) {
+        fprintf(stderr, "Out of memory!\n");
+        exit(EXIT_FAILURE);
+    }
 
-  return p;
+    return p;
 }

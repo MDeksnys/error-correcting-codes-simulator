@@ -1,6 +1,8 @@
 #pragma once
 
 #include "matrix.h"
+#include <stdint.h>
+#include <stddef.h>
 
 // Encodes a single vector.
 //
@@ -8,8 +10,7 @@
 // vec      - vector to encode
 //
 // Returns the encoded vector.
-uint64_t
-encode(Matrix *matrix_p, uint64_t vec);
+uint64_t encode(Matrix *matrix_p, uint64_t vec);
 
 // Encodes an array of message vectors using the provided generator matrix.
 //
@@ -19,5 +20,4 @@ encode(Matrix *matrix_p, uint64_t vec);
 //
 // Returns a newly allocated array of codewords.
 // Caller is responsible for freeing the returned array.
-uint64_t *
-encode_all(Matrix *matrix_p, uint64_t *vectors, size_t vec_count);
+uint64_t *encode_all(Matrix *matrix_p, uint64_t *vectors, size_t vec_count);
