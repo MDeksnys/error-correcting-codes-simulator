@@ -4,7 +4,7 @@ import numpy as np
 
 probs = np.arange(0, 1.01, 0.05)
 num_of_seeds = 1000
-a11_cmd = "./a11"
+a11_cmd = "./A11"
 n = 5
 k = 1
 input_vec = "1"
