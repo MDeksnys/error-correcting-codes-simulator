@@ -48,8 +48,3 @@ static inline void try_swap_rows(Matrix *matrix_p, uint8_t target_row_col);
 // matrix_p         - pointer to the matrix
 // target_row_col   - the target row AND target column
 static inline void try_swap_cols(Matrix *matrix_p, uint8_t target_row_col);
-
-// Removes all commas from a string in-place.
-//
-// str - the string to process
-static inline void remove_commas(char *str);

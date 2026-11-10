@@ -20,7 +20,7 @@ typedef struct {
 // Returns a newly allocated Matrix structure containing the parsed data.
 // If the input string is invalid, returns a Matrix with all fields set to 0 / NULL.
 // Caller is responsible for freeing the allocated memory in the Matrix.
-Matrix matrix_from_str(char *str, uint8_t row_count, uint8_t col_count);
+Matrix matrix_from_str(const char *str, uint8_t row_count, uint8_t col_count);
 
 // Prints the contents of a Matrix.
 //

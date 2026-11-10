@@ -18,7 +18,7 @@ const char usage[] =
     "  -n <length>       Code length.\n"
     "  -k <dimension>    Code dimension, from 1 to n.\n"
     "  -g <matrix>       Generator matrix with k rows and n columns of 0 and 1.\n"
-    "                    Rows can be separated with commas.\n"
+    "                    Rows are separated by commas.\n"
     "\n"
     "Optional arguments:\n"
     "  -s <scenario>     1 = single vector, 2 = text, 3 = BMP image.\n"

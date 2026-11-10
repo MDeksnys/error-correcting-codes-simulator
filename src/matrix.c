@@ -9,44 +9,48 @@
 #include "matrix_internal.h"
 #include "memory.h"
 
-Matrix matrix_from_str(char *str, uint8_t row_count, uint8_t col_count) {
-    uint8_t *data = NULL;
-    uint8_t *order = NULL;
-    char *temp_str = NULL;
+Matrix matrix_from_str(const char *str, uint8_t row_count, uint8_t col_count) {
+    if (str == NULL || row_count == 0 || col_count == 0)
+        return (Matrix){0};
 
-    temp_str = safe_strdup(str);
-    remove_commas(temp_str);
+    // row_count - 1 for each comma
+    const size_t expected_len = row_count * col_count + (row_count - 1);
 
-    if (strlen(temp_str) != row_count * col_count)
-        goto bad;
+    if (strlen(str) != expected_len)
+        return (Matrix){0};
 
-    data = safe_malloc(row_count * col_count);
-    order = safe_malloc(col_count);
+    uint8_t *data = safe_malloc(row_count * col_count);
+    uint8_t *order = safe_malloc(col_count);
 
     for (uint8_t i = 0; i < col_count; i++)
         order[i] = i;
 
-    for (uint8_t row = 0; row < row_count; row++) {
-        for (uint8_t col = 0; col < col_count; col++) {
-            uint8_t index = row * col_count + col;
+    const char *itr = str;
 
-            uint8_t value = temp_str[index] - '0';
-            if (value != 0 && value != 1)
+    for (uint8_t row = 0; row < row_count; row++) {
+        for (uint8_t col = 0; col < col_count; col++, itr++) {
+            const char symbol = *itr;
+            if (symbol != '0' && symbol != '1')
                 goto bad;
 
-            data[index] = value;
+            size_t index = (size_t)row * col_count + col;
+            data[index] = symbol - '0';
         }
+
+        if (row + 1 < row_count && *(itr++) != ',')
+            goto bad;
     }
 
-    safe_free(temp_str);
-    return (
-        Matrix){.row_count = row_count, .col_count = col_count, .data = data,
-                .order = order};
+    return (Matrix){
+        .row_count = row_count,
+        .col_count = col_count,
+        .data = data,
+        .order = order
+    };
 
 bad:
     safe_free(order);
     safe_free(data);
-    safe_free(temp_str);
     return (Matrix){0};
 }
 
@@ -339,20 +343,4 @@ static inline void try_swap_cols(Matrix *matrix_p, uint8_t target_row_col) {
             return;
         }
     }
-}
-
-static inline void remove_commas(char *str) {
-    char *write_ptr = str;
-    char *read_ptr = str;
-
-    while (*read_ptr != '\0') {
-        *write_ptr = *read_ptr;
-
-        if (*read_ptr != ',')
-            write_ptr++;
-
-        read_ptr++;
-    }
-
-    *write_ptr = '\0';
 }
