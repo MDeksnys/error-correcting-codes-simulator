@@ -15,7 +15,7 @@ const char usage[] =
     "\n"
     "Required arguments:\n"
     "  -p <probability>  Probability that a bit is flipped, from 0 to 1.\n"
-    "  -n <length>       Code length.\n"
+    "  -n <length>       Code length, at most 64.\n"
     "  -k <dimension>    Code dimension, from 1 to n.\n"
     "  -g <matrix>       Generator matrix with k rows and n columns of 0 and 1.\n"
     "                    Rows are separated by commas.\n"
@@ -57,29 +57,28 @@ Cli cli_init(int argc, char **argv) {
 }
 
 bool cli_is_valid(Cli *cli_p) {
-    Cli cli = *cli_p;
-
-    bool required_arguments_given = cli.code_dimension_given && cli.code_length_given &&
-                                    cli.error_probability_given &&
-                                    cli.generator_matrix_given;
+    bool required_arguments_given = cli_p->code_dimension_given &&
+                                    cli_p->code_length_given &&
+                                    cli_p->error_probability_given &&
+                                    cli_p->generator_matrix_given;
 
     if (!required_arguments_given)
         return false;
 
-    bool scenario_in_bounds =
-        !cli.scenario_given || (cli.scenario >= 1 && cli.scenario <= 3);
+    bool scenario_in_bounds = !cli_p->scenario_given ||
+                              (cli_p->scenario >= 1 && cli_p->scenario <= 3);
 
-    bool error_probability_in_bounds =
-        cli.error_probability <= 1 && cli.error_probability >= 0;
+    bool error_probability_in_bounds = cli_p->error_probability >= 0 &&
+                                       cli_p->error_probability <= 1;
 
-    bool arguments_are_valid =
-        scenario_in_bounds && cli.code_dimension <= cli.code_length &&
-        error_probability_in_bounds && matrix_is_valid(&cli.generator_matrix);
+    bool dimensions_in_bounds = cli_p->code_dimension >= 1 &&
+                                cli_p->code_dimension <= cli_p->code_length &&
+                                cli_p->code_length <= 64;
 
-    if (!arguments_are_valid)
-        return false;
-
-    return true;
+    return scenario_in_bounds &&
+           dimensions_in_bounds &&
+           error_probability_in_bounds &&
+           matrix_is_valid(&cli_p->generator_matrix);
 }
 
 void cli_print_usage(FILE *out, const char *program) {

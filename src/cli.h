@@ -48,7 +48,8 @@ Cli cli_init(int argc, char **argv);
 //   - code dimension, code length, and error probability were provided
 //   - generator matrix is provided and valid
 //   - scenario (if given) is within [1, 3]
-//   - code dimension does not exceed code length
+//   - code dimension is at least 1 and does not exceed code length
+//   - code length is at most 64
 //   - error probability is between 0 and 1
 // Returns false if any of these conditions are not met.
 bool cli_is_valid(Cli *cli_p);
