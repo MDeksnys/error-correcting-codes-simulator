@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -40,28 +41,34 @@ void scenario2(Cli *cli_p) {
 
     puts("Sending over channel...");
     uint64_t *received_unencoded_vecs = channel_send_vectors(vecs, vec_count, p_e, k);
+
     puts("Converting...");
     char *received_unencoded_msg =
         bytes_from_vectors(received_unencoded_vecs, vec_count, k, input_len);
 
     puts("Encoding...");
     uint64_t *encoded_vecs = encode_all(G, vecs, vec_count);
+
     puts("Sending over channel...");
-    uint64_t *received_encoded_vecs = channel_send_vectors(
-        encoded_vecs,
-        vec_count,
-        p_e,
-        n
-    );
+    uint64_t *received_encoded_vecs =
+        channel_send_vectors(encoded_vecs, vec_count, p_e, n);
+
     puts("Decoding...");
     uint64_t *received_decoded_vecs = decode_all(G, received_encoded_vecs, vec_count);
+
     puts("Converting...");
     char *received_decoded_msg =
         bytes_from_vectors(received_decoded_vecs, vec_count, k, input_len);
 
     printf("\nOriginal:\n%s\n", input);
-    printf("\nNot encoded:\n%s\n", received_unencoded_msg);
-    printf("\nEncoded and decoded:\n%s\n", received_decoded_msg);
+
+    printf("\nNot encoded:\n");
+    fwrite(received_unencoded_msg, 1, input_len, stdout);
+    printf("\n");
+
+    printf("\nEncoded and decoded:\n");
+    fwrite(received_decoded_msg, 1, input_len, stdout);
+    printf("\n");
 
     safe_free(vecs);
     safe_free(input);
@@ -77,35 +84,30 @@ static inline char *request_input(void) {
     char *buffer = safe_malloc(MAXIMUM_INPUT_LENGTH);
     buffer[0] = '\0';
 
-    const char *sentinel = ".\n";
     size_t used = 0;
+    char line[MAXIMUM_INPUT_LENGTH];
 
-    while (true) {
-        char line[MAXIMUM_INPUT_LENGTH];
-
-        if (fgets(line, MAXIMUM_INPUT_LENGTH, stdin) == NULL)
-            break;
-
-        if (strcmp(line, sentinel) == 0) {
+    while (fgets(line, MAXIMUM_INPUT_LENGTH, stdin) != NULL) {
+        if (strcmp(line, ".\n") == 0 || strcmp(line, ".") == 0) {
             // Ignore previous newline (cleaner print formatting)
-            if (used > 0)
-                buffer[used - 1] = '\0';
+            if (used > 0 && buffer[used - 1] == '\n')
+                buffer[--used] = '\0';
 
             break;
         }
 
         size_t length = strlen(line);
-        if (used + length + 1 >= MAXIMUM_INPUT_LENGTH) {
-            length = MAXIMUM_INPUT_LENGTH - used - 1;
-            memcpy(buffer + used, line, length);
-            buffer[MAXIMUM_INPUT_LENGTH] = '\0';
+        bool full = used + length + 1 >= MAXIMUM_INPUT_LENGTH;
 
-            break;
-        }
+        if (full)
+            length = MAXIMUM_INPUT_LENGTH - used - 1;
 
         memcpy(buffer + used, line, length);
         used += length;
         buffer[used] = '\0';
+
+        if (full)
+            break;
     }
 
     return buffer;
