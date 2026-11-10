@@ -9,9 +9,34 @@
 #include "matrix.h"
 #include "memory.h"
 
+const char usage[] =
+    "Usage: %s -p <probability> -n <length> -k <dimension> -g <matrix>\n"
+    "           [-s <scenario>] [--seed <number>]\n"
+    "\n"
+    "Required arguments:\n"
+    "  -p <probability>  Probability that a bit is flipped, from 0 to 1.\n"
+    "  -n <length>       Code length.\n"
+    "  -k <dimension>    Code dimension, from 1 to n.\n"
+    "  -g <matrix>       Generator matrix with k rows and n columns of 0 and 1.\n"
+    "                    Rows can be separated with commas.\n"
+    "\n"
+    "Optional arguments:\n"
+    "  -s <scenario>     1 = single vector, 2 = text, 3 = BMP image.\n"
+    "                    All three run in order if omitted.\n"
+    "  --seed <number>   Seed for the random number generator.\n"
+    "                    The current time is used if omitted.\n"
+    "  -h, --help        Show this message.\n"
+    "\n"
+    "Example:\n"
+    "  %s -p 0.1 -n 7 -k 4 -g 1000101,0100110,0010111,0001011 -s 1\n";
+
 Cli cli_init(int argc, char **argv) {
     Cli cli = {0};
     char *matrix_str = NULL;
+
+    for (int i = 1; i < argc; i++)
+        if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0)
+            cli.help = true;
 
     for (short i = 1; i < argc - 1; i++) {
         char *current = argv[i];
@@ -57,61 +82,8 @@ bool cli_is_valid(Cli *cli_p) {
     return true;
 }
 
-void cli_print_error(Cli *cli_p) {
-    assert(cli_p != NULL);
-
-    Cli cli = *cli_p;
-
-#define ERROR_CHECK_AND_PRINT(pred, msg) \
-  if ((pred)) {                          \
-    puts((msg));                         \
-    cli_free(cli_p);                     \
-    return;                              \
-  }
-
-    ERROR_CHECK_AND_PRINT(
-        !cli.error_probability_given,
-        "ERROR: error probability (-p) was not provided."
-    );
-
-    ERROR_CHECK_AND_PRINT(
-        !cli.code_length_given,
-        "ERROR: code length (-n) was not provided."
-    );
-
-    ERROR_CHECK_AND_PRINT(
-        !cli.code_dimension_given,
-        "ERROR: code dimension (-k) was not provided."
-    );
-
-    ERROR_CHECK_AND_PRINT(
-        !cli.generator_matrix_given,
-        "ERROR: generator matrix (-g) was not provided."
-    );
-
-    ERROR_CHECK_AND_PRINT(
-        cli.error_probability < 0 || cli.error_probability > 1,
-        "ERROR: error probability must be between 0 and 1."
-    );
-
-    ERROR_CHECK_AND_PRINT(
-        cli.code_dimension > cli.code_length,
-        "ERROR: code dimension cannot be greater than the code length."
-    );
-
-    ERROR_CHECK_AND_PRINT(
-        !matrix_is_valid(&cli.generator_matrix),
-        "ERROR: generator matrix data is invalid. "
-        "Possibly caused by incorrect number of elements, or "
-        "use of illegal characters."
-    );
-
-    ERROR_CHECK_AND_PRINT(
-        cli.scenario_given && !(cli.scenario >= 1 && cli.scenario <= 3),
-        "ERROR: scenario must be one of these values: 1, 2, 3."
-    );
-
-#undef ERROR_CHECK_AND_PRINT
+void cli_print_usage(FILE *out, const char *program) {
+    fprintf(out, usage, program, program);
 }
 
 void cli_free(Cli *cli_p) {

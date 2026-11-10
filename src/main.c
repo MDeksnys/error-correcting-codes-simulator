@@ -10,8 +10,14 @@
 int main(int argc, char **argv) {
     Cli cli = cli_init(argc, argv);
 
+    if (argc == 1 || cli.help) {
+        cli_print_usage(stdout, argv[0]);
+        cli_free(&cli);
+        return 0;
+    }
+
     if (!cli_is_valid(&cli)) {
-        cli_print_error(&cli);
+        cli_print_usage(stderr, argv[0]);
         cli_free(&cli);
         return 1;
     }

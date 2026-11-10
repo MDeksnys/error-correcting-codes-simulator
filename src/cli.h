@@ -2,6 +2,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #include "matrix.h"
 
@@ -27,6 +28,8 @@ typedef struct {
 
     uint64_t seed;
     bool seed_given;
+
+    bool help;
 } Cli;
 
 // Parses command-line arguments into a Cli struct.
@@ -50,11 +53,11 @@ Cli cli_init(int argc, char **argv);
 // Returns false if any of these conditions are not met.
 bool cli_is_valid(Cli *cli_p);
 
-// Prints an appropriate error message describing why the provided Cli
-// struct is invalid.
+// Prints how the program is used: the arguments, what they mean, and an example.
 //
-// cli_p - pointer to an invalid Cli struct
-void cli_print_error(Cli *cli_p);
+// out     - stream to print to (stdout for a help request, stderr for invalid arguments)
+// program - name the program (argv[0])
+void cli_print_usage(FILE *out, const char *program);
 
 // Frees dynamically allocated memory inside a Cli struct.
 //
