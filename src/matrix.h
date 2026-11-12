@@ -7,7 +7,8 @@
 typedef struct {
     uint8_t row_count;
     uint8_t col_count;
-    uint8_t *data;
+    uint64_t *rows; // Each row stored as a bitmask
+    uint64_t *cols; // Each column stored as a bitmask (transposed)
     uint8_t *order;
 } Matrix;
 
@@ -21,11 +22,6 @@ typedef struct {
 // If the input string is invalid, returns a Matrix with all fields set to 0 / NULL.
 // Caller is responsible for freeing the allocated memory in the Matrix.
 Matrix matrix_from_str(const char *str, uint8_t row_count, uint8_t col_count);
-
-// Prints the contents of a Matrix.
-//
-// matrix_p - pointer to a valid Matrix
-void matrix_print(Matrix *matrix_p);
 
 // Constructs the parity-check matrix for a given generator matrix.
 //

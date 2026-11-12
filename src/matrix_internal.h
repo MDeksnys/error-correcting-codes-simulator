@@ -48,3 +48,8 @@ static inline void try_swap_rows(Matrix *matrix_p, uint8_t target_row_col);
 // matrix_p         - pointer to the matrix
 // target_row_col   - the target row AND target column
 static inline void try_swap_cols(Matrix *matrix_p, uint8_t target_row_col);
+
+// Rebuilds the column bitmasks from the row bitmasks of a matrix.
+//
+// matrix_p - pointer to a valid Matrix
+static inline void matrix_rebuild_cols(Matrix *matrix_p);

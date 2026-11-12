@@ -86,7 +86,8 @@ void cli_print_usage(FILE *out, const char *program) {
 }
 
 void cli_free(Cli *cli_p) {
-    safe_free(cli_p->generator_matrix.data);
+    safe_free(cli_p->generator_matrix.rows);
+    safe_free(cli_p->generator_matrix.cols);
     safe_free(cli_p->generator_matrix.order);
 }
 

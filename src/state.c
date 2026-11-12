@@ -34,9 +34,11 @@ State state_init(Cli *cli_p) {
 }
 
 void state_free(State *state_p) {
-    safe_free(state_p->generator_matrix.data);
+    safe_free(state_p->generator_matrix.rows);
+    safe_free(state_p->generator_matrix.cols);
     safe_free(state_p->generator_matrix.order);
-    safe_free(state_p->parity_check_matrix.data);
+    safe_free(state_p->parity_check_matrix.rows);
+    safe_free(state_p->parity_check_matrix.cols);
     safe_free(state_p->parity_check_matrix.order);
     safe_free(state_p->weights);
 }
