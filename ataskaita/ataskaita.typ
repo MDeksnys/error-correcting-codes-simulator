@@ -61,8 +61,8 @@ Būtini parametrai:
 - Kodo ilgis: `-n [skaičius]`.
 - Kodo dimensija: `-k [skaičius]`.
 - Kodą generuojanti matrica: `-g [matrica]`.
-  - `[matrica]` tai $n dot m$ ilgio 0-ių ir 1-tų seka,
-    kurią galima suskaidyti naudojant kablelį "`,`".
+  - `[matrica]` - matrica iš $k$ eilučių, kurių kiekvienoje yra po $n$ simbolių: 0 arba 1.
+    Eilutės atskiriamos kableliais.
 
 Pasirinktini parametrai:
 - Scenarijus: `-s [scenarijus]`.
@@ -74,8 +74,7 @@ Pasirinktini parametrai:
 = Programos failai
 
 - src/bit_string.c
-  - Funkcijos darbui su bitu eilutėmis: konvertavimas į baitų eilutes, skaidymas į
-    vektorius ir pan.
+  - Vektorių skaidymas iš baitų ir jungimas atgal į baitus.
 - src/channel.c
   - Funkcijos kanalo modeliui:
     klaidų vektorių generavimas ir vektorių persiuntimas.
@@ -97,6 +96,8 @@ Pasirinktini parametrai:
   - Antro scenarijaus logika.
 - src/scenario3.c
   - Trečio scenarijaus logika.
+- src/state.c
+  - Programos būsenos paruošimas kodavimui ir dekodavimui
 - src/vector.c
   - Vektorių operacijos ir pagalbinės funkcijos.
 
@@ -155,9 +156,13 @@ vėliau dekoduojant vektorių, jų galima būtų atsikratyti.
 
 Vektoriai siunčiami kanalu prie jų pridedant atsitiktinai sugeneruotą klaidų vektorių.
 
-Vektoriai saugomi kaip simbolių masyvai (`char *`), t.y. kiekvienas duomenų bitas saugomas kaip
-'0' arba '1'. Tai aštuonis kartus padidina atminties naudojimą ir apsunkina tam tikrus
-skaičiavimus, bet alternatyvūs laikymo metodai taip pat turi savų sudėtingumų.
+Vektoriai saugomi kaip 64 bitų sveikieji skaičiai (`uint64_t`), kur $i$-tasis bitas yra
+vektoriaus $i$-oji koordinatė, todėl vektorių sudėtis yra XOR operacija, o svoris
+skaičiuojamas pagal bitų skaičių. Dėl to $n <= 64$.
+
+Iš komandinės eilutės argumentų vieną kartą sudaroma struktūra `State`. Joje
+saugomos generuojanti ir kontrolinė matricos bei kiekvieno sindromo klasės lyderio
+svoris.
 
 = Eksperimentai
 
