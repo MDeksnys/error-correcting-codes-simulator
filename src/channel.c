@@ -7,7 +7,7 @@
 uint64_t channel_error_vector(double error_probability, uint8_t length) {
     uint64_t error = 0;
 
-    for (uint8_t i = 0; i < length; i++)
+    for (size_t i = 0; i < length; i++)
         if (((double)rand() / (double)RAND_MAX) < error_probability)
             error |= (uint64_t)1 << i;
 

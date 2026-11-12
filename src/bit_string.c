@@ -17,7 +17,7 @@ void vectors_from_string(
     for (size_t i = 0; i < vector_count; i++) {
         uint64_t vector = 0;
 
-        for (uint8_t j = 0; j < vector_length; j++) {
+        for (size_t j = 0; j < vector_length; j++) {
             size_t bit_index = i * vector_length + j;
 
             if (bit_index >= total_bits)
@@ -46,7 +46,7 @@ char *bytes_from_vectors(
     size_t bit_count = byte_count * 8;
 
     for (size_t i = 0; i < vector_count; i++) {
-        for (uint8_t j = 0; j < vector_length; j++) {
+        for (size_t j = 0; j < vector_length; j++) {
             size_t index = i * vector_length + j;
 
             if (index >= bit_count)

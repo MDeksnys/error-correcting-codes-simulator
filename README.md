@@ -21,9 +21,5 @@ gcc -O3 -DNDEBUG -fopenmp src/*.c -o A11
 ```bash
 ./A11 -p 0.1 -n 7 -k 4 -g 1000101,0100110,0010111,0001011 -s 3 --seed 123
 ```
-## Planned improvements
-- Precompute the parity-check matrix and syndrome tables once per run.
-- Use an arena allocator to simplify memory management.
-
 ## Report
 Full report (Lithuanian): `ataskaita/ataskaita.pdf`

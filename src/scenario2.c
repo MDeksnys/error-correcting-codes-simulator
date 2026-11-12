@@ -1,3 +1,5 @@
+#include "scenario2.h"
+
 #include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -6,7 +8,6 @@
 
 #include "bit_string.h"
 #include "channel.h"
-#include "cli.h"
 #include "decode.h"
 #include "encode.h"
 #include "matrix.h"
@@ -16,15 +17,13 @@
 
 #include "scenario2_internal.h"
 
-void scenario2(Cli *cli_p) {
-    assert(cli_is_valid(cli_p));
-
+void scenario2(State *state_p) {
     puts("--- SCENARIO 2 ---");
 
-    double p_e = cli_p->error_probability;
-    uint8_t k = cli_p->code_dimension;
-    uint8_t n = cli_p->code_length;
-    Matrix *G = &cli_p->generator_matrix;
+    double p_e = state_p->error_probability;
+    uint8_t k = state_p->k;
+    uint8_t n = state_p->n;
+    Matrix *G = &state_p->generator_matrix;
 
     puts(
         "Enter text below. "
@@ -54,7 +53,7 @@ void scenario2(Cli *cli_p) {
         channel_send_vectors(encoded_vecs, vec_count, p_e, n);
 
     puts("Decoding...");
-    uint64_t *received_decoded_vecs = decode_all(G, received_encoded_vecs, vec_count);
+    uint64_t *received_decoded_vecs = decode_all(state_p, received_encoded_vecs, vec_count);
 
     puts("Converting...");
     char *received_decoded_msg =

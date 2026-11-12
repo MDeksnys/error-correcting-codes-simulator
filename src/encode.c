@@ -1,6 +1,5 @@
 #include "encode.h"
 
-#include <assert.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -8,8 +7,6 @@
 #include "memory.h"
 
 uint64_t encode(Matrix *matrix_p, uint64_t vec) {
-    assert(matrix_is_valid(matrix_p));
-
     return vector_matrix_mul(vec, matrix_p);
 }
 

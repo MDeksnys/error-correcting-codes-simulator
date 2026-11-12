@@ -1,8 +1,8 @@
 #pragma once
 
-#include "cli.h"
+#include "state.h"
 
 // Executes scenario 3 (BMP image).
 //
-// cli_p - pointer to a valid CLI struct
-void scenario3(Cli *cli_p);
+// state_p - pointer to the state
+void scenario3(State *state_p);

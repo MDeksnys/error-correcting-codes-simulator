@@ -38,7 +38,7 @@ Cli cli_init(int argc, char **argv) {
         if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0)
             cli.help = true;
 
-    for (short i = 1; i < argc - 1; i++) {
+    for (int i = 1; i < argc - 1; i++) {
         char *current = argv[i];
         char *next = argv[i + 1];
 

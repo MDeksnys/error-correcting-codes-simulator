@@ -1,3 +1,5 @@
+#include "scenario3.h"
+
 #include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -18,7 +20,6 @@
 
 #include "bit_string.h"
 #include "channel.h"
-#include "cli.h"
 #include "memory.h"
 #include "scenario3_internal.h"
 
@@ -33,15 +34,13 @@ struct {
     } header;
 } metadata;
 
-void scenario3(Cli *cli_p) {
-    assert(cli_is_valid(cli_p));
-
+void scenario3(State *state_p) {
     puts("--- SCENARIO 3 ---");
 
-    double p_e = cli_p->error_probability;
-    uint8_t k = cli_p->code_dimension;
-    uint8_t n = cli_p->code_length;
-    Matrix *G = &cli_p->generator_matrix;
+    double p_e = state_p->error_probability;
+    uint8_t k = state_p->k;
+    uint8_t n = state_p->n;
+    Matrix *G = &state_p->generator_matrix;
 
     calculate_metadata();
     open_file(metadata.filename);
@@ -70,7 +69,7 @@ void scenario3(Cli *cli_p) {
         n
     );
     puts("Decoding...");
-    uint64_t *received_decoded_vecs = decode_all(G, received_encoded_vecs, vec_count);
+    uint64_t *received_decoded_vecs = decode_all(state_p, received_encoded_vecs, vec_count);
     puts("Converting...");
     char *received_decoded_msg =
         bytes_from_vectors(received_decoded_vecs, vec_count, k, len);

@@ -6,22 +6,20 @@
 #include <stdlib.h>
 
 #include "channel.h"
-#include "cli.h"
 #include "decode.h"
 #include "encode.h"
 #include "matrix.h"
 #include "scenario1_internal.h"
+#include "state.h"
 #include "vector.h"
 
-void scenario1(Cli *cli_p) {
-    assert(cli_is_valid(cli_p));
-
+void scenario1(State *state_p) {
     puts("--- SCENARIO 1 ---");
 
-    double p_e = cli_p->error_probability;
-    uint8_t k = cli_p->code_dimension;
-    uint8_t n = cli_p->code_length;
-    Matrix *G = &cli_p->generator_matrix;
+    double p_e = state_p->error_probability;
+    uint8_t k = state_p->k;
+    uint8_t n = state_p->n;
+    Matrix *G = &state_p->generator_matrix;
 
     uint64_t input = request_input_vector(k);
     uint64_t encoded = encode(G, input);
@@ -43,7 +41,7 @@ void scenario1(Cli *cli_p) {
         print_all_vectors(k, n, input, encoded, error, received);
     }
 
-    uint64_t decoded = decode(G, received);
+    uint64_t decoded = decode(state_p, received);
 
     char input_str[65];
     char decoded_str[65];
